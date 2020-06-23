@@ -32,6 +32,6 @@ RSpec.describe 'authenticate a user', type: :feature do
     click_on 'Sign out'
     expect(page).to have_content('Email')
     expect(page).to have_content('Sign up')
-
+  
   end
 end
