@@ -5,6 +5,7 @@ $primary-color: #8bc34a;
 $primary-color-light: #dcedc8;
 $primary-color-text: #212121;
 $divider-color: #bdbdbd;
+$primary-color-danger: rgba(167, 32, 8, 0.746);
 
 * {
   margin: 0;
@@ -43,25 +44,21 @@ a {
   color: $primary-color-light;
 
   .menu {
-    width: 60%;
+    width: 70%;
     justify-content: space-between;
-  
 
     .menu-item {
       float: left;
-      margin: 0 10px;
-      
+      margin: 0 15px;
 
       .active {
         a {
           color: #fff;
         }
-      
       }
     }
   }
 }
-
 
 .nav a {
   color: $primary-color-light;
@@ -165,7 +162,12 @@ form {
     }
   }
 }
-
+.d-flex {
+  display: flex;
+}
+.just-between{
+  justify-content: space-between;
+}
 .title {
   text-align: center;
   margin-bottom: 16px;
@@ -302,6 +304,51 @@ form {
     margin: 0 0 8px 0;
     color: $primary-color-dark;
   }
+
+  ul li {
+
+    .btn {
+      display: inline-block;
+      font-weight: 400;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      border: 1px solid transparent;
+      padding: .375rem .75rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      border-radius: .25rem;
+      transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+
+    .btn-danger {
+      color: #fff;
+      background-color: #bd2130;
+      border-color: #b21f2d;
+    }
+
+    .btn-success {
+      color: #fff;
+      background-color: #1e7e34;
+      border-color: #1c7430;
+    }
+
+    .btn-checked {
+      color: #fff;
+      background-color: #117a8b;
+      border-color: #10707f;
+    }
+  }
 }
 
 .user-section {
@@ -310,6 +357,21 @@ form {
 
   h2 {
     text-transform: capitalize;
+  }
+  .profile-btn {
+    font-size: 0.8em;
+    font-weight: 900;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: .7em 1em;
+    margin: 0 0 8px 0;
+    background-color: $primary-color-dark;
+    color: $primary-color-light;
+  }
+
+  .profile-btn:hover{
+    background-color: #8bc34a;
+    color: #fff;
   }
 
   .timeline {
@@ -320,6 +382,42 @@ form {
     justify-content: start;
   }
 }
+.pend-requests-section {
+  width: 100%;
+
+  h3 {
+    text-transform: capitalize;
+    margin-top: 1em;
+    margin-bottom: 1em;;
+  }
+  li {
+    padding-bottom: .3em;
+    padding-top: .3em;
+    border-bottom: 1px solid #bdbdbd;
+    small{
+      color: #bdbdbd;
+      align-self: start;
+    }
+  }
+  .profile-link {
+    font-size: 0.8em;
+    margin: 0 8px 8px 0;
+  }
+  .red {
+    color: $primary-color-danger !important;
+  }
+  
+  .requests {
+    width: 100%;
+    h3 {
+      width: 100%;
+    }
+    justify-content: start;
+  }
+}
+
+
+
 
 @media only screen and (min-width: 480px) {
   form {

@@ -1,0 +1,13 @@
+
+<% requests.each do |r| %>
+  <li class = "d-flex just-between"> 
+    <div>
+      <%= link_to r.requestor.name, r.requestor %>
+      <small><%= " - "+time_ago_in_words(r.created_at)+" ago." %></small>
+    </div>
+    <div>
+      <%= link_to 'Accept', user_friendship_path(r, status: 'confirmed' ), class: 'profile-link', method:"PATCH" %>
+      <%= link_to 'Decline', user_friendship_path(r, status: 'declined' ), class: 'profile-link red', method:"PATCH", data: { confirm: 'Are you sure?' } %>
+    </div>
+  </li>
+<% end %>

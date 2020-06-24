@@ -9,52 +9,104 @@ class User < ApplicationRecord
   has_many :posts
   has_many :comments, dependent: :destroy
   has_many :likes, dependent: :destroy
-  has_many :friend_requests
-  has_many :inverse_friend_requests, class_name: 'FriendRequest', foreign_key: 'friend_id'
 
-  def friends
-    friends_array = friend_requests.map { |friendship| friendship.friend if friendship.confirmed }
-    friends_arrayb = inverse_friend_requests.map { |friendship| friendship.user if friendship.confirmed }
-    friends_array.concat(friends_arrayb)
-    friends_array.compact
+  has_many :friendships, -> { where status: 'confirmed' }, class_name: 'UserFriendship', foreign_key: 'user_id'
+  has_many :invitations, class_name: 'UserFriendship', foreign_key: 'user_id'
+  has_many :requests, class_name: 'UserFriendship', foreign_key: 'friend_id'
+
+  has_many :friends, through: :friendships, source: 'friend'
+  has_many :invitees, through: :invitations, source: 'friend'
+  has_many :requestors, through: :requests, source: 'requestor'
+
+  scope :with_status, ->(status) { where 'user_friendships.status = ?', status }
+
+  def invitation_status_with(user_id)
+    return nil unless invitations.to_user(user_id).exists?
+
+    invitations.to_user(user_id).first.status
   end
 
-  def pending_invites
-    friend_requests.map { |friendship| friendship.friend unless friendship.confirmed }.compact
+  def requested_status_with(user_id)
+    return nil unless requests.from_user(user_id).exists?
+
+    requests.from_user(user_id).first.status
   end
 
-  def pending_friends
-    inverse_friend_requests.map { |friendship| friendship.user unless friendship.confirmed }.compact
+  def pending_invitations
+    invitations.with_status('requested')
   end
 
-  def friend_invites(user_id)
-    friendship = friend_requests.find_by(friend_id: user_id)
-    true if friendship && friendship.confirmed == false
+  def pending_requests
+    requests.with_status('requested')
   end
 
-  def receive_invitation(user_id)
-    friendship = inverse_friend_requests.find_by(user_id: user_id)
-    true if friendship && friendship.confirmed == false
+  def pending_invitation_for?(user_id)
+    invitations.to_user(user_id).with_status('requested').exists?
   end
 
-  def send_invitation(user_id)
-    @friendship = FriendRequest.new(user_id: id, friend_id: user_id)
-    @friendship.confirmed = false
-    @friendship.save
+  def pending_invitation_for(user_id)
+    invitations.to_user(user_id).with_status('requested').first
   end
 
-  def confirm_invites(user_id)
-    friendship = inverse_friend_requests.find_by(user_id: user_id)
-    friendship.confirmed = true
-    friendship.save
+  def pending_request_from?(user_id)
+    requests.from_user(user_id).with_status('requested').exists?
   end
 
-  def reject_invites(user)
-    friendship = inverse_friend_requests.find_by(user_id: user)
-    friendship.destroy
+  def pending_request_from(user_id)
+    requests.from_user(user_id).with_status('requested').first
   end
 
-  def friend?(user)
-    friends.include?(user)
+  def friends_with?(user_id)
+    friendships.where('friend_id = ?', user_id).exists?
+  end
+
+  def friendship_with(user_id)
+    friendships.where('friend_id = ?', user_id).first
+  end
+
+  def invite(user_id)
+    if pending_request_from?(user_id) || pending_invitation_for?(user_id) || user_id == id
+      puts 'Not invited because there was a pending invitation or request from that user'
+    else
+      UserFriendship.update_invite(id, user_id, 'requested')
+    end
+  end
+
+  def cancel_invite(user_id)
+    if pending_invitation_for?(user_id)
+      UserFriendship.update_invite(id, user_id, 'cancelled')
+    else
+      puts 'No pending invitation for that user'
+    end
+  end
+
+  def accept_request_from(user_id)
+    if pending_request_from?(user_id)
+      UserFriendship.update_friendship(user_id, id, 'confirmed')
+    else
+      puts 'No pending request from that user'
+    end
+  end
+
+  def decline_request_from(user_id)
+    if pending_request_from?(user_id)
+      UserFriendship.update_invite(user_id, id, 'declined')
+    else
+      puts 'No pending request from that user'
+    end
+  end
+
+  def unfriend(user_id)
+    if friends_with?(user_id)
+      UserFriendship.update_friendship(user_id, id, 'cancelled')
+    else
+      puts 'this user was not your friend'
+    end
+  end
+
+  def timeline_posts
+    friends_n_self = friends.map(&:id)
+    friends_n_self << id
+    Post.where('user_id IN (?)', friends_n_self).ordered_by_most_recent
   end
 end

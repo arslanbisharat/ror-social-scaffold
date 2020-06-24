@@ -1,78 +1,87 @@
 require 'rails_helper'
+
 RSpec.describe User, type: :model do
-  describe 'validations' do
-    it { should validate_presence_of(:name) }
-    it { should validate_length_of(:name).is_at_most(20) }
-    it { should validate_presence_of(:email) }
-    it { should validate_uniqueness_of(:email).case_insensitive }
-    it { should allow_value('test@test.com').for(:email) }
+  let(:user1) do
+    User.create(id: 1, name: 'example_user', email: 'user@email.com',
+                password: '123456', gravatar_url: nil)
   end
-  describe 'associations' do
-    it { should have_many(:posts) }
-    it { should have_many(:comments) }
-    it { should have_many(:likes) }
-    it { should have_many(:friend_requests) }
-    it { should have_many(:inverse_friend_requests).class_name('FriendRequest').with_foreign_key(:friend_id) }
+
+  let(:user2) do
+    User.create(id: 2, name: 'example_user_2', email: 'user_2@email.com',
+                password: '123456', gravatar_url: nil)
   end
-  describe 'user class methods' do
-    before(:each) do
-      @user1 = FactoryBot.create(:user, name: 'Sunday', email: 'sunday@example.com')
-      @user2 = FactoryBot.create(:user, name: 'john', email: 'johnd@example.com')
-      @friend = FactoryBot.create(:user, name: 'Phyl', email: 'phyl@example.com')
-      @friend_request1 = FactoryBot.create(:friend_request, user_id: @user1.id, friend_id: @friend.id, confirmed: false)
-      @friend_request2 = FactoryBot.create(:friend_request, user_id: @user2.id, friend_id: @friend.id, confirmed: true)
-    end
 
-    it 'checks if friend sending invitaion' do
-      expect(@user2.send_invitation(@friend.id)).to eql(true)
-      expect(@friend_request1.confirmed).to eql(false)
-    end
+  let(:user3) do
+    User.new(name: 'example_user_3', email: 'user_3@email.com',
+             password: '123456', gravatar_url: nil)
+  end
 
-    it 'checks for pending invitaion' do
-      @user1.send_invitation(@friend.id)
-      expect(@user1.pending_invites).to include(@friend)
-      expect(@friend_request1.confirmed).not_to eql(true)
-    end
+  # rubocop:disable Lint/AmbiguousBlockAssociation
+  it 'should be able to create friend invitations' do
+    expect { user1.invite user2.id }.to change { user1.invitations.count }.by(1)
+  end
 
-    it 'checks for pending friends' do
-      @friend.send_invitation(@user1.id)
-      expect(@user1.pending_friends).to include(@friend)
-    end
+  it 'should not be able to invite a user if there is an invitation pending response already' do
+    user1.invite user2.id
+    expect { user1.invite user2.id }.to_not change { user1.invitations.count }
+  end
 
-    it 'checks for confirming invitaion' do
-      @friend.send_invitation(@user2.id)
-      expect(@friend.confirm_invites(@user2.id)).to be(true)
-      expect(@friend_request2.confirmed).to eql(true)
-    end
+  it 'should be able to receive friend requests' do
+    expect { user1.invite user2.id }.to change { user2.requests.count }.by(1)
+  end
 
-    it 'checks for receive invitaion' do
-      @friend.send_invitation(@user1.id)
-      expect(@user1.receive_invitation(@friend.id)).to be(true)
-      expect(@friend_request1.confirmed).to eql(false)
-    end
+  it 'should not be able to increase friend requests if there is one pending response already' do
+    user1.invite user2.id
+    expect { user1.invite user2.id }.to_not change { user2.requests.count }
+  end
 
-    it 'checks for friends invited' do
-      @friend.send_invitation(@user1.id)
-      expect(@friend.friend_invites(@user1.id)).to be(true)
-      expect(@friend_request1.confirmed).to eql(false)
-    end
+  it 'should not increase count of friends when invitation is declined' do
+    user1.invite user2.id
+    expect { user2.decline_request_from user1.id }.to_not change { user1.friends.count }
 
-    it 'checks for rejecting invitaion' do
-      @user1.send_invitation(@friend.id)
-      @friend.reject_invites(@user1.id)
-      expect(@user1.friends).not_to include(@friend)
-    end
+    expect(user1.friends_with?(user2.id)).to be false
+  end
 
-    it 'confirms if a user is a friend' do
-      @user1.send_invitation(@friend.id)
-      @user2.send_invitation(@friend.id)
-      expect(@user1.friend?(@friend)).to be(false)
-      expect(@user2.friend?(@friend)).to be(true)
-    end
+  it 'should increase count of friends when invitation is accepted' do
+    user1.invite user2.id
+    expect { user2.accept_request_from user1.id }.to change { user1.friends.count }.by(1)
 
-    it 'confirms if a user is among friends' do
-      @user1.send_invitation(@friend.id)
-      expect(@user1.friends).not_to include(@friend)
-    end
+    expect(user1.friends_with?(user2.id)).to be true
+  end
+
+  it 'should reflect friendship for both sides' do
+    user1.invite user2.id
+    user2.accept_request_from user1.id
+    expect(user1.friends_with?(user2.id)).to be true
+    expect(user2.friends_with?(user1.id)).to be true
+  end
+
+  it 'it should be able to unfriend a user who was a friend' do
+    user1.invite user2.id
+    user2.accept_request_from user1.id
+    expect { user2.unfriend user1.id }.to change { user2.friends.count }
+  end
+
+  it 'is not valid if there are the same email saved' do
+    user = User.new(name: 'Other', email: 'user@email.com')
+    expect(user).to_not be_valid
+  end
+
+  it 'is not valid without an name' do
+    user3.name = ''
+    expect(user3).to_not be_valid
+  end
+
+  it 'is not valid with name biger than 20 characters' do
+    user3.name = 'a' * 21
+    expect(user3).to_not be_valid
+  end
+
+  describe 'Associations' do
+    it { should have_many :friends }
+    it { should have_many :invitations }
+    it { should have_many :requests }
   end
 end
+
+# rubocop:enable Lint/AmbiguousBlockAssociation

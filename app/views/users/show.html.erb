@@ -1,23 +1,28 @@
 <section class="user-section">
-  <h2><%= "Name: #{@user.name}" %></h2>
-  <ul>
-     <li>
-          <% if current_user.friend_invites(@user) %>
-            <button class="btn btn-warning"> Pending Invitation </button>
-          <% elsif current_user.receive_invitation(@user) %>
-            <%= link_to 'Accept', accept_invite_path(user_id: @user.id), class:"btn btn-primary" %>
-            <%= link_to 'Decline', reject_invite_path(user_id: @user.id), method: :delete, class:"btn btn-danger" %>
-          <% elsif !current_user.friend?(@user) && current_user.id != @user.id %>
-            <%= link_to 'Add Friend', send_invite_path(user_id: @user.id) , class:"btn btn-success" %>
-          <% elsif current_user.friend?(@user) %>
-            <%= link_to 'Remove friend', remove_friend_path(user_id: @user.id), method: :delete, data: {confirm: "Are you sure you want to remove friend?"}, class: "btn btn-danger" %>
-          <% end %>
-        </li>
-  </ul>
+  <div class="d-flex just-between">
+    <h2><%= "Name: #{@user.name}" %></h2>
+    <% unless current_user == @user ||
+        current_user.pending_invitation_for?(@user) || 
+        current_user.friends_with?(@user) || 
+        current_user.pending_request_from?(@user) %>
+      <%= link_to 'Add Friend',  user_friendships_path(user_friendship: {user_id: current_user.id, friend_id: @user.id}), class: 'profile-btn', method: 'post' %>
+    <% end %>
+  </div>
   <article class="timeline">
     <h3>Recent posts:</h3>
     <ul class="posts">
       <%= render @posts %>
     </ul>
   </article>
+  <% if @user == current_user && current_user.requests.any? %>
+    <section class="pend-requests-section">
+      <article class="requests">
+        <h3>Pending Requests:</h3>
+        <ul class="request-list">
+          <%= render 'user_friendships/friend_requests', requests: current_user.pending_requests %>
+        </ul>
+      </article>
+    </section>
+  <% end %>
 </section>
+
