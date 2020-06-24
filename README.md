@@ -9,7 +9,7 @@
 
 ## Live Demo
 
-Go to [link](https://social-media-ror.herokuapp.com/) to see the live version.
+Go to [link](https://ror-social-scaffold.herokuapp.com/) to see the live version.
 
 ## Getting Started
 
