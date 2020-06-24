@@ -1,2 +1,0 @@
-module UserFriendshipsHelper
-end

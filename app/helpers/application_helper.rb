@@ -16,31 +16,18 @@ module ApplicationHelper
     end
   end
 
-  def friends_check(user)
-    return false unless Friendship.where(user_id: current_user.id, friend_id: user.id, confirmed: true).exists? && Friendship.where(user_id: user.id, friend_id: current_user.id, confirmed: true).exists?
+  def request_friend(user)
+    html = ''
+    html += link_to 'Invite to friendship', friendships_path(user: user), method: :post unless current_user.added?(user)
 
-    true
+    html.html_safe
   end
 
-  def pending_request(user)
-    return false unless Friendship.where(user_id: current_user.id, friend_id: user.id, confirmed: false).exists? || Friendship.where(user_id: user.id, friend_id: current_user.id, confirmed: false).exists?
+  def requests?
+    @requests = Friendship.where(friend: current_user, confirmed: nil)
+    html = 'Friend Requests '
+    html += @requests.count.to_s if @requests
 
-    @pending_request = current_user.inverse_friendships.where(confirmed: false, user_id: user.id).first
-    true
-  end
-
-  def accept_friend(friendship)
-    link_to('Accept', update_friend_user_path(id: friendship.id), method: :patch)
-  end
-
-  def reject_friend(friendship)
-    link_to('Decline', destroy_friend_user_path(id: friendship.id), method: :delete)
-  end
-
-  def unfriend(user)
-    a = Friendship.where(user_id: current_user.id, friend_id: user.id, confirmed: true)
-    b = Friendship.where(user_id: user.id, friend_id: current_user.id, confirmed: true)
-    friendship = a.exists? ? a : b
-    link_to('Unfriend', destroy_friend_user_path(id: friendship.ids), method: :delete)
+    html.html_safe
   end
 end
