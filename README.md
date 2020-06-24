@@ -4,13 +4,12 @@
 
 ## Built With
 
-- Ruby v2.7.0
-- Ruby on Rails v5.2.4
+- Ruby 
+- Ruby on Rails 
 
 ## Live Demo
 
-TBA
-
+Go to [link](https://ror-social-scaffold.herokuapp.com/) to see the live version.
 
 ## Getting Started
 
@@ -18,9 +17,9 @@ To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-Ruby: 2.6.3
-Rails: 5.2.3
-Postgres: >=9.5
+Ruby
+Rails
+Postgres
 
 ### Setup
 
@@ -55,31 +54,22 @@ Open `http://localhost:3000/` in your browser.
     rpsec --format documentation
 ```
 
-> Tests will be added by Microverse students. There are no tests for initial features in order to make sure that students write all tests from scratch.
-
-### Deployment
-
-TBA
 
 ## Authors
 
-TBA
+👤 **Muhammad Arslan**
+
+- Github: [@githubhandle](https://github.com/arslanbisharat)
+- Twitter: [@twitterhandle](https://twitter.com/arslan_bisharat)
+- Linkedin: [linkedin](https://www.linkedin.com/in/muhammad-arslan-2020bb156)
+
 
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!
 
-Feel free to check the [issues page](issues/).
+Feel free to check the [issues page](issues/https://github.com/arslanbisharat/ror-social-scaffold/issues).
 
 ## Show your support
 
 Give a ⭐️ if you like this project!
-
-## Acknowledgments
-
-TBA
-
-## 📝 License
-
-TBA
-
