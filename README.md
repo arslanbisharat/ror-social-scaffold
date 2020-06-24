@@ -60,7 +60,7 @@ Open `http://localhost:3000/` in your browser.
 👤 **Muhammad Arslan**
 
 - Github: [@githubhandle](https://github.com/arslanbisharat)
-- Twitter: [@twitterhandle](https://twitter.com arslan_bisharat)
+- Twitter: [@twitterhandle](https://twitter.com/arslan_bisharat)
 - Linkedin: [linkedin](https://www.linkedin.com/in/muhammad-arslan-2020bb156)
 
 
