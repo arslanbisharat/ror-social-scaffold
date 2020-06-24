@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto:400,700,900&display=swap");
 
-$primary-color-dark: #689f38;
-$primary-color: #8bc34a;
+$primary-color-dark: rgba(243, 11, 23, 0.4);
+$primary-color: #ca0808;
 $primary-color-light: #dcedc8;
 $primary-color-text: #212121;
 $divider-color: #bdbdbd;
@@ -43,25 +43,21 @@ a {
   color: $primary-color-light;
 
   .menu {
-    width: 60%;
+    width: 80%;
     justify-content: space-between;
-  
 
     .menu-item {
       float: left;
-      margin: 0 10px;
-      
+      margin: 0 15px;
 
       .active {
         a {
           color: #fff;
         }
-      
       }
     }
   }
 }
-
 
 .nav a {
   color: $primary-color-light;
@@ -101,7 +97,7 @@ a {
 
 .errors {
   font-size: 10px;
-  color: red;
+  color: rgb(3, 41, 3);
 }
 
 form {
@@ -161,7 +157,7 @@ form {
       font-size: 1em;
     }
     ul {
-      color: #f00;
+      color: rgb(34, 247, 44);
     }
   }
 }
@@ -196,7 +192,7 @@ form {
     width: 100%;
 
     .form-control {
-      border: 1px solid #f00;
+      border: 1px solid rgb(20, 63, 204);
     }
   }
 
