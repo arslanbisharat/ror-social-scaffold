@@ -3,43 +3,18 @@
     <% @users.each do |user| %>
       <li>
         Name: <%= user.name %>
-        <span class="file-link">
-          <% if user_signed_in? %>
-            <%= link_to 'See Profile',  user_path(user), class: 'profile-link' %>
-          <% end %>
+        <span class="profile-link">
+          <%= link_to 'See Profile',  user_path(user), class: 'profile-link' %> | 
         </span>
-        <% if user.id != current_user.id %>
-          <% if !current_user.invitation_status_with(user).nil? %>
-            <% case current_user.invitation_status_with(user) %>
-              <% when 'confirmed' %>
-                <%= button_tag 'Friends ✓', class: 'btn btn-sucess', type: 'reset', disabled: true %>
-                <%= link_to '✘', user_friendship_path(current_user.friendship_with(user)), class: 'btn btn-danger', method:"DELETE", data: { confirm: 'Are you sure you want to delete this frienship?' } %>
-              <% when 'cancelled' %>
-                <%= 'CANCELLED' %>
-              <% when 'declined' %>
-                <%= 'DECLINED' %>
-              <% when 'requested' %>
-                <%= button_tag 'Pending ۩', class: 'btn btn-checked', type: 'reset', disabled: true %>
-                <%= link_to '✘', user_friendship_path(current_user.pending_invitation_for(user), status: 'cancelled' ), class: 'btn btn-danger', method:"PATCH", data: { confirm: 'Are you sure you want to cancel this request?' } %>
-            <% end %>
-          <% else %>
-            <% if !current_user.requested_status_with(user).nil?%> 
-              <% case current_user.requested_status_with(user) %>
-              <% when 'confirmed' %>
-                <%= button_tag 'Friends ✓', class: 'btn btn-sucess', type: 'reset', disabled: true %>
-                <%= link_to '✘', "#", class: 'btn btn-danger', method:"PATCH", data: { confirm: 'Are you sure you want to delete this frienship?' } %>
-              <% when 'cancelled' %>
-                <%= 'CANCELLED' %>
-              <% when 'declined' %>
-                <%= 'DECLINED' %>
-              <% when 'requested' %>
-                <%= link_to 'Accept Friendship', user_friendship_path(current_user.pending_request_from(user), status: 'confirmed' ), class: 'btn btn-success', method: 'PATCH', data: {confirm: "Are you sure you want to accept this request?" }%>
-                <%= link_to '✘', user_friendship_path(current_user.pending_request_from(user), status: 'declined' ), class: 'btn btn-danger', method:"PATCH", data: { confirm: 'Are you sure you want to decline this request?' } %>
-            <% end %>
-            <% else %>
-              <%= link_to 'Add Friend',  user_friendships_path(id: user.id), class: 'btn btn-primary', method: 'post', data: {confirm: "Are you sure you want to add a friend?" }%>
-              <% end %>
+        <% if current_user != user && friends_check(user) == false && pending_request(user) == false %>
+          <%= link_to 'Send friend request', "/users/#{user.id}/send_friend", class: 'profile-link' %>
+        <% elsif pending_request(user) %>
+          <span class= 'profile-link'>Friend request pending</span> 
+          <% if !@pending_request.blank? %>
+            <span class= 'profile-link'><%= accept_friend(@pending_request) %> | <%= reject_friend(@pending_request) %></span>
           <% end %>
+        <% elsif friends_check(user) %>
+          <span class= 'profile-link'>Friends!!!</span> <span class= 'profile-link'><%= unfriend(user) %></span>
         <% end %>
       </li>
     <% end %>
