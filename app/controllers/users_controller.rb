@@ -27,10 +27,7 @@ class UsersController < ApplicationController
 
   def destroy_friend
     @friendship = Friendship.find(params[:id])
-
-    # rubocop:disable Layout/LineLength
     @friendship2 = Friendship.where(user_id: @friendship.friend_id, friend_id: @friendship.user_id, confirmed: true).first
-    # rubocop:enable Layout/LineLength
 
     @friendship.destroy
     @friendship2&.destroy

@@ -1,5 +1,4 @@
 module ApplicationHelper
-  # rubocop:disable  Layout/LineLength
   def menu_link_to(link_text, link_path)
     class_name = current_page?(link_path) ? 'menu-item active' : 'menu-item'
 
@@ -18,17 +17,13 @@ module ApplicationHelper
   end
 
   def friends_check(user)
-    unless Friendship.where(user_id: current_user.id, friend_id: user.id, confirmed: true).exists? && Friendship.where(user_id: user.id, friend_id: current_user.id, confirmed: true).exists?
-      return false
-    end
+    return false unless Friendship.where(user_id: current_user.id, friend_id: user.id, confirmed: true).exists? && Friendship.where(user_id: user.id, friend_id: current_user.id, confirmed: true).exists?
 
     true
   end
 
   def pending_request(user)
-    unless Friendship.where(user_id: current_user.id, friend_id: user.id, confirmed: false).exists? || Friendship.where(user_id: user.id, friend_id: current_user.id, confirmed: false).exists?
-      return false
-    end
+    return false unless Friendship.where(user_id: current_user.id, friend_id: user.id, confirmed: false).exists? || Friendship.where(user_id: user.id, friend_id: current_user.id, confirmed: false).exists?
 
     @pending_request = current_user.inverse_friendships.where(confirmed: false, user_id: user.id).first
     true
@@ -48,5 +43,4 @@ module ApplicationHelper
     friendship = a.exists? ? a : b
     link_to('Unfriend', destroy_friend_user_path(id: friendship.ids), method: :delete)
   end
-  # rubocop:enable  Layout/LineLength
 end
